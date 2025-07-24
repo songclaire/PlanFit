@@ -12,7 +12,6 @@ public class SchdPtcptDto extends BaseDto {
 
     private Long schdPtcptSn;
     private String ptcptTypeNm;
-    private String ptcptNm;
     private String useYn;
 
 }

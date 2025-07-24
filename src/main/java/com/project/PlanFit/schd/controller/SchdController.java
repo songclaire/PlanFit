@@ -2,9 +2,9 @@ package com.project.PlanFit.schd.controller;
 
 import com.project.PlanFit.schd.dto.SchdDto;
 import com.project.PlanFit.schd.dto.SchdTypeDto;
+import com.project.PlanFit.schd.entity.Schd;
 import com.project.PlanFit.schd.service.SchdService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,5 +33,14 @@ public class SchdController {
     public ResponseEntity<?> saveSchd(@RequestBody SchdDto dto) {
         schdService.saveSchd(dto);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 일정 목록 조회
+     */
+    @PostMapping(name = "일정 목록 조회", path = "/schdList")
+    public List<SchdDto> selectSchdList(@RequestBody SchdDto dto) {
+        List<SchdDto> list = schdService.selectSchdList(dto);
+        return list;
     }
 }

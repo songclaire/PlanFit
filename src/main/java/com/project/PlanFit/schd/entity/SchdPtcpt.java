@@ -21,9 +21,6 @@ public class SchdPtcpt extends BaseEntity {
     @Column(name = "PTCPT_TYPE_NM")
     private String ptcptTypeNm;
 
-    @Column(name = "PTCPT_NM")
-    private String ptcptNm;
-
     @Column(name = "USE_YN")
     private String useYn;
 }

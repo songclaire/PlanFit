@@ -28,7 +28,8 @@ import ScheduleForm from './ScheduleForm.vue'
 
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
 const events = ref([])
 
@@ -40,22 +41,46 @@ const calendarOptions = ref({
   events
 })
 
+/**
+ * 일정 추가 버튼
+ */
 function handleAddClick() {
   showDetailForm.value = true;
 }
 
-// 등록 후 달력에 적용하기
+/**
+ * 일정 목록 출력
+ */
+async function selectSchdList() {
+    try {
+        const schdList = await axios.post('/api/schdList')
+        console.log( 'schdList', schdList)
+        alert('조회됐따!')
+    } catch (err) {
+        console.error('등록 실패', err)
+        alert('조회 실패')
+    }
+}
+
+/**
+ * 등록 후 달력 적용
+ */
 function addEventToCalendar(newEvent) {
     console.log('@@@@@ new Event??', newEvent);
     events.value = [
         ...events.value,
         {
-            schdTtl: newEvent.schdTtl,
-            startDt: newEvent.startDt,
-            endDt: newEvent.endDt,
+            title: newEvent.schdTtl,
+            start: newEvent.startDt,
+            end: newEvent.endDt,
         },
     ];
+    showDetailForm.value = false;
 }
+
+onMounted(() => {
+    selectSchdList()
+})
 
 </script>
 

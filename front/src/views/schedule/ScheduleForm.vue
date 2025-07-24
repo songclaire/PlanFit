@@ -44,14 +44,16 @@
     <div class="form-row">
       <label>참여자</label>
       <div class="participant-row">
-        <select v-model="form.ptcptTypeNm">
-          <option value="혼자">혼자</option>
-          <option value="남편">남편</option>
-          <option value="가족">가족</option>
-          <option value="친구/지인">친구/지인</option>
+        <select v-model="form.schdPtcptSn">
+            <option value=""> -- 선택 -- </option>
+            <option
+                v-for="ptcpt in schdPtcptList"
+                :key="ptcpt.schdPtcptSn"
+                :value="ptcpt.schdPtcptSn"
+            >
+            {{ ptcpt.ptcptTypeNm }}
+            </option>
         </select>
-
-        <input type="text" v-model="form.ptcptNm" placeholder="참여자 이름" />
       </div>
     </div>
 
@@ -61,7 +63,6 @@
       <input type="text" v-model="form.location" />
     </div>
 
-    <!-- 버튼 -->
     <div class="form-row">
       <button type="submit" class="submit-button">등록</button>
     </div>
@@ -82,14 +83,19 @@ const form = ref({
   schdCn: '',
   location: '',
   ptcptTypeNm: '',
-  ptcptNm: ''
+  schdPtcptSn: '',
 })
 
+// 일정 종류 목록
 const schdTypeList = ref([])
+// 일정 참가자 목록
+const schdPtcptList = ref([])
 
+/**
+ * 일정 저장
+ */
 async function submitForm() {
     try {
-        console.log('form.value????????????', form.value)
         await axios.post('/api/saveSchd', form.value)
         // 달력에 적용하기
         emit('schedule-added', { ...form.value })
@@ -100,14 +106,27 @@ async function submitForm() {
     }
 }
 
-onMounted( async () => {
+async function loadSchdTypeList() {
     try {
-        const response = await axios.get('/api/schdTypeList')
-        console.log('response 결과는?', response)
-        schdTypeList.value = response.data
+        const schdTypeRes = await axios.get('/api/schdTypeList')
+        schdTypeList.value = schdTypeRes.data
     } catch (err) {
         console.error('일정종류 불러오기 실패', err)
     }
+}
+
+async function loadSchdPtcptList() {
+    try {
+        const schdPtcptRes = await axios.get('/api/schdPtcptList')
+        schdPtcptList.value = schdPtcptRes.data
+    } catch (err) {
+        console.error('일정종류 불러오기 실패', err)
+    }
+}
+
+onMounted( async () => {
+    loadSchdTypeList()
+    loadSchdPtcptList()
 })
 
 
