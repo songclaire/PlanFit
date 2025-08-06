@@ -14,9 +14,17 @@
       <!-- 오른쪽: 일정 상세 or 내용 보기 -->
       <div class="detail-area">
         <h3>
-          {{ showDetailForm ? '📝 일정 추가' : '📝 일정 정보' }}
+          {{ mode === 'edit' && selectedEvent?.schdSn ? '📝 일정 수정'
+               : mode === 'edit' ? '📝 일정 추가'
+               : '📝 일정 정보' }}
         </h3>
-        <ScheduleForm v-if="showDetailForm" @schedule-added="addEventToCalendar" />
+        <ScheduleForm
+            v-if="showDetailForm"
+            :initial-data="selectedEvent"
+            :mode="mode"
+            @schedule-added="addEventToCalendar"
+            @edit-mode="handleEditMode"
+        />
         <!-- 나중에 목록, 수정, 삭제 등 여기에 붙이면 됨 -->
       </div>
     </div>
@@ -32,20 +40,37 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 const events = ref([])
+const selectedEvent = ref(null)
+const mode = ref('edit')
 
 const showDetailForm = ref(false)
 
-const calendarOptions = ref({
-  plugins: [dayGridPlugin],
-  initialView: 'dayGridMonth',
-  events
+const calendarOptions = ref ({
+    plugins: [dayGridPlugin],
+    initialView: 'dayGridMonth',
+    events,
+    eventClick: handleEventClick,
+    dateClick: handleDateClick
 })
 
 /**
  * 일정 추가 버튼
  */
 function handleAddClick() {
-  showDetailForm.value = true;
+    selectedEvent.value = {
+        schdSn: '',
+        schdTypeSn: '',
+        schdTtl: '',
+        startDt: '',
+        endDt: '',
+        schdCn: '',
+        location: '',
+        ptcptTypeNm: '',
+        schdPtcptSn: '',
+        color: ''
+    }
+    mode.value = 'edit'
+    showDetailForm.value = true;
 }
 
 /**
@@ -53,9 +78,18 @@ function handleAddClick() {
  */
 async function selectSchdList() {
     try {
-        const schdList = await axios.post('/api/schdList')
-        console.log( 'schdList', schdList)
-        alert('조회됐따!')
+        const res = await axios.post('/api/schdList', {})
+        const schdList = res.data
+        console.log('✅일정 목록', schdList)
+
+        //FullCalendar에 맞게 매핑
+        events.value = schdList.map(item => ({
+            id: item.schdSn,
+            title: item.schdTtl,
+            start: item.startDt,
+            end: addOneDay(item.endDt),
+            backgroundColor: item.color
+        }))
     } catch (err) {
         console.error('등록 실패', err)
         alert('조회 실패')
@@ -63,19 +97,58 @@ async function selectSchdList() {
 }
 
 /**
- * 등록 후 달력 적용
+ * 등록 후 바로 달력 적용
  */
 function addEventToCalendar(newEvent) {
-    console.log('@@@@@ new Event??', newEvent);
-    events.value = [
-        ...events.value,
-        {
-            title: newEvent.schdTtl,
-            start: newEvent.startDt,
-            end: newEvent.endDt,
-        },
-    ];
-    showDetailForm.value = false;
+    const index = events.value.findIndex(ev => ev.id === newEvent.schdSn)
+
+    const updatedEvent = {
+        id: newEvent.schdSn,
+        title: newEvent.schdTtl,
+        start: newEvent.startDt,
+        end: addOneDay(newEvent.endDt),
+        backgroundColor: newEvent.color
+    }
+
+    // 이미 등록된 건을 수정하는 경우
+    if (index !== -1) {
+        events.value.splice(index, 1, updatedEvent)
+    // 처음 등록하는 건일 경우
+    } else {
+        events.value.push(updatedEvent)
+    }
+    showDetailForm.value = false
+}
+
+// 달력 일정 클릭 후 등록폼 출력
+function handleDateClick(info) {
+    console.log('날짜 클릭', info.dateStr)
+}
+
+// 달력 일정 클릭시 조회
+async function handleEventClick(info) {
+    try {
+        const schdSn = info.event.id
+        const res = await axios.get(`/api/schd/${schdSn}`)
+        selectedEvent.value = res.data
+        mode.value = 'view'
+        showDetailForm.value = true
+    } catch (err) {
+        console.error('상세 조회 실패', err)
+        alert('조회 실패!')
+    }
+}
+
+// END_DT 설정
+function addOneDay(dateStr) {
+    const date = new Date(dateStr)
+    date.setDate(date.getDate() + 1)
+    return date.toISOString().split('T')[0]
+}
+
+// 자식에서 '수정' 클릭 시
+function handleEditMode() {
+    mode.value = 'edit'
 }
 
 onMounted(() => {
@@ -83,6 +156,12 @@ onMounted(() => {
 })
 
 </script>
+
+
+
+
+
+
 
 <style scoped>
 .schedule-wrapper {
