@@ -4,6 +4,9 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 
+import 'quasar/dist/quasar.css'
+import { Quasar } from 'quasar'
+
 // Axios 인터셉터 설정 (요청마다 토큰 헤더 자동 추가)
 axios.interceptors.request.use(config => {
   const token = localStorage.getItem('accessToken');
@@ -17,4 +20,6 @@ axios.interceptors.request.use(config => {
 
 const app = createApp(App)
 app.use(router)
+app.use(Quasar)
+
 app.mount('#app')

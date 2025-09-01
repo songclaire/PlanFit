@@ -179,6 +179,11 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 24px;
 }
+.header-row h2 {
+  font-size: 30px; /* 기존보다 작게 조절 */
+  font-weight: 600;
+  margin: 0;
+}
 
 .main-layout {
   display: flex;
@@ -197,6 +202,12 @@ onMounted(() => {
   border: 1px solid #e0e6f1;
 }
 
+.detail-area h3 {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
 .add-button {
   background-color: #e3edf8;
   color: #1a73e8;
@@ -213,4 +224,5 @@ onMounted(() => {
   background-color: #d2e3f8;
   color: #1a5ec9;
 }
+
 </style>
