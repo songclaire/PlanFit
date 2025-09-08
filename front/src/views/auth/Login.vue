@@ -37,6 +37,7 @@ const handleLogin = async () => {
 
         // JWT 토큰을 localStorage에 저장
         localStorage.setItem('accessToken', token);
+        localStorage.setItem('userId', userId.value);
         localStorage.setItem('userName', res.data.userName);
 
          // ⭐ 로그인 성공 시 로그인 상태 reactive 상태 변경 (event 또는 전역 상태 필요)
@@ -62,6 +63,13 @@ const handleLogin = async () => {
   border-radius: 12px;
   background-color: #fff;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+.login-container h2 {
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  line-height: 1.2;
 }
 
 h2 {

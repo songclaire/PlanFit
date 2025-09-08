@@ -22,6 +22,7 @@ public class SchdDto extends BaseDto {
     private Long rgnProvcSn;
     private Long rgnCitySn;
 
+    private String color;
     private String schdTtl;
     private LocalDate startDt;
     private LocalDate endDt;
@@ -33,11 +34,13 @@ public class SchdDto extends BaseDto {
     public static SchdDto fromEntity(Schd entity) {
         SchdDto dto = new SchdDto();
         dto.setSchdSn(entity.getSchdSn());
+        dto.setColor(entity.getColor());
         dto.setSchdTtl(entity.getSchdTtl());
         dto.setStartDt(entity.getStartDt());
         dto.setEndDt(entity.getEndDt());
         dto.setSchdTypeSn(entity.getSchdTypeSn());
         dto.setSchdPtcptSn(entity.getSchdPtcptSn());
+        dto.setSchdCn(entity.getSchdCn());
         dto.setLocation(entity.getLocation());
         return dto;
     }

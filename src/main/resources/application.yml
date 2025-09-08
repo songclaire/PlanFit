@@ -13,12 +13,18 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # ?? ?? update / ??? none ?? validate
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
     open-in-view: false
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 logging:
   level:
@@ -26,3 +32,8 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 jwt:
   secret: thisIsASecretKeyWithAtLeast32CharactersLong!!
+
+file:
+  base-dir: ./uploads     # 실제 쓰기 가능한 경로
+  max-size: 104857600
+  allowed-ext: [jpg,jpeg,png,gif,webp,pdf,ppt,pptx,doc,docx,xls,xlsx,hwp,hwpx,zip]

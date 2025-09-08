@@ -36,6 +36,9 @@ public class Schd extends BaseEntity {
     @Column(name = "RGN_CITY_SN")
     private Long rgnCitySn;
 
+    @Column(name = "COLOR")
+    private String color;
+
     @Column(name = "SCHD_TTL")
     private String schdTtl;
 

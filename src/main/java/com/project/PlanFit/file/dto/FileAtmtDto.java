@@ -1,6 +1,7 @@
-package com.project.PlanFit.cmmn.dto;
+package com.project.PlanFit.file.dto;
 
-import com.project.PlanFit.cmmn.entity.FileAtmt;
+import com.project.PlanFit.cmmn.dto.BaseDto;
+import com.project.PlanFit.file.entity.FileAtmt;
 import lombok.*;
 
 @Getter
@@ -18,6 +19,7 @@ public class FileAtmtDto extends BaseDto {
     private String menuType;
     private Long menuId;
     private String isThumb;
+    private String tmprStrgYn;
 
     public static FileAtmtDto fromEntity(FileAtmt entity) {
         FileAtmtDto dto = new FileAtmtDto();
@@ -30,6 +32,23 @@ public class FileAtmtDto extends BaseDto {
         dto.setMenuType(entity.getMenuType());
         dto.setMenuId(entity.getMenuId());
         dto.setIsThumb(entity.getIsThumb());
+        dto.setTmprStrgYn(entity.getTmprStrgYn());
         return dto;
     }
+
+    public FileAtmt toEntity() {
+        return FileAtmt.builder()
+                .fileId(this.fileId)
+                .originFileNm(this.originFileNm)
+                .storedFileNm(this.storedFileNm)
+                .fileSize(this.fileSize)
+                .fileExtension(this.fileExtension)
+                .filePath(this.filePath)
+                .menuType(this.menuType)
+                .menuId(this.menuId)
+                .isThumb(this.isThumb)
+                .tmprStrgYn(this.tmprStrgYn)
+                .build();
+    }
+
 }

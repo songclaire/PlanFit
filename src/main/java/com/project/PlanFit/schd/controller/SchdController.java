@@ -36,11 +36,31 @@ public class SchdController {
     }
 
     /**
+     * 일정 수정
+     */
+    @PostMapping(name = "일정 수정", path = "/editSchd/{schdSn}")
+    public ResponseEntity<?> updateSchd(@PathVariable Long schdSn, @RequestBody SchdDto dto) {
+        dto.setSchdSn(schdSn);
+        schdService.updateSchd(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * 일정 목록 조회
      */
     @PostMapping(name = "일정 목록 조회", path = "/schdList")
     public List<SchdDto> selectSchdList(@RequestBody SchdDto dto) {
         List<SchdDto> list = schdService.selectSchdList(dto);
         return list;
+    }
+
+    /**
+     * 일정 상세 조회
+     */
+    @GetMapping(name = "일정 상세 조회", path = "/schd/{schdSn}")
+    public ResponseEntity<SchdDto> selectSchdDetail(@PathVariable Long schdSn) {
+        SchdDto dto = schdService.selectSchdDetail(schdSn);
+        return ResponseEntity.ok(dto);
+//        return ResponseEntity.ok(schdService.selectSchdDetail(schdSn));
     }
 }

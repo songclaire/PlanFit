@@ -4,8 +4,10 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 
-import 'quasar/dist/quasar.css'
+import 'quasar/src/css/index.sass'
 import { Quasar } from 'quasar'
+import quasarLang from 'quasar/lang/ko-KR'
+import '@quasar/extras/material-icons/material-icons.css'
 
 // Axios 인터셉터 설정 (요청마다 토큰 헤더 자동 추가)
 axios.interceptors.request.use(config => {
@@ -20,6 +22,12 @@ axios.interceptors.request.use(config => {
 
 const app = createApp(App)
 app.use(router)
-app.use(Quasar)
+app.use(Quasar, {
+  plugins: {}, // 필요한 플러그인 넣을 수 있음
+  lang: quasarLang
+})
+
+const token = localStorage.getItem('accessToken')
+if (token) axios.defaults.headers.common.Authorization = `Bearer ${token}`
 
 app.mount('#app')

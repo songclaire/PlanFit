@@ -1,5 +1,6 @@
-package com.project.PlanFit.cmmn.entity;
+package com.project.PlanFit.file.entity;
 
+import com.project.PlanFit.cmmn.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,4 +41,7 @@ public class FileAtmt extends BaseEntity {
 
     @Column(name = "IS_THUMB")
     private String isThumb;
+
+    @Column(name = "TMPR_STRG_YN")
+    private String tmprStrgYn;
 }

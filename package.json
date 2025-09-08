@@ -3,6 +3,11 @@
     "@fullcalendar/core": "^6.1.18",
     "@fullcalendar/daygrid": "^6.1.18",
     "@fullcalendar/vue3": "^6.1.18",
-    "axios": "^1.10.0"
+    "axios": "^1.10.0",
+    "lodash": "^4.17.21",
+    "quasar": "^2.18.2"
+  },
+  "devDependencies": {
+    "sass-embedded": "^1.90.0"
   }
 }

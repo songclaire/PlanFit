@@ -57,16 +57,41 @@ public class SchdService {
         // 일정 저장
         Schd schd = new Schd();
         schd.setSchdTypeSn(dto.getSchdTypeSn());
-        schd.setSchdDmnSn(1L); // 일정관리
+        schd.setSchdDmnSn(1L);
         schd.setSchdPtcptSn(dto.getSchdPtcptSn());
+        schd.setColor(dto.getColor());
         schd.setSchdTtl(dto.getSchdTtl());
         schd.setStartDt(dto.getStartDt());
         schd.setEndDt(dto.getEndDt());
         schd.setSchdCn(dto.getSchdCn());
         schd.setLocation(dto.getLocation());
-        // 🧙🏻‍♂️나중️🧙🏻‍♂️ 지역쪽 추가하기 (현재는 NULL로 들어감)
 
         schdRepository.save(schd);
+    }
+
+    /**
+     * 일정 수정
+     */
+    public void updateSchd(SchdDto dto) {
+        Long schdSn = dto.getSchdSn();
+        if (schdSn == null) {
+            throw new IllegalArgumentException("수정하려면 schdSn이 필요합니다.");
+        }
+
+        Schd exist = schdRepository.findById(schdSn)
+                .orElseThrow(() -> new IllegalArgumentException("해당 일정이 존재하지 않습니다."));
+
+        exist.setSchdTypeSn(dto.getSchdTypeSn());
+        exist.setSchdPtcptSn(dto.getSchdPtcptSn());
+        exist.setColor(dto.getColor());
+        exist.setSchdTtl(dto.getSchdTtl());
+        exist.setStartDt(dto.getStartDt());
+        exist.setEndDt(dto.getEndDt());
+        exist.setSchdCn(dto.getSchdCn());
+        exist.setLocation(dto.getLocation());
+
+        schdRepository.save(exist);
+
     }
 
     /**
@@ -77,6 +102,16 @@ public class SchdService {
                 .filter(getPredicate(dto))
                 .map(SchdDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 일정 상세 조회
+     */
+    public SchdDto selectSchdDetail(Long schdSn) {
+        Schd schd = schdRepository.findById(schdSn)
+                .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다." + schdSn ));
+
+        return SchdDto.fromEntity(schd);
     }
 
 }

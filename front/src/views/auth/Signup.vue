@@ -116,6 +116,12 @@ const handleSignup = async () => {
   background-color: #fff;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
+.signup-container h2 {
+  font-size: 30px; /* or 22px, 취향껏 */
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 1.5rem;
+}
 
 h2 {
   text-align: center;

@@ -1,6 +1,7 @@
-package com.project.PlanFit.cmmn.dto;
+package com.project.PlanFit.comment.dto;
 
-import com.project.PlanFit.cmmn.entity.Comments;
+import com.project.PlanFit.cmmn.dto.BaseDto;
+import com.project.PlanFit.comment.entity.Comment;
 import lombok.*;
 
 @Getter
@@ -8,15 +9,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CommentsDto extends BaseDto {
+public class CommentDto extends BaseDto {
     private Long commentId;
     private String menuType;
     private Long menuId;
     private Long parentId;
     private String commentCn;
 
-    public static CommentsDto fromEntity(Comments entity) {
-        CommentsDto dto = new CommentsDto();
+    public static CommentDto fromEntity(Comment entity) {
+        CommentDto dto = new CommentDto();
         dto.setCommentId(entity.getCommentId());
         dto.setMenuType(entity.getMenuType());
         dto.setMenuId(entity.getMenuId());

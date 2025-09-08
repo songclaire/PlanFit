@@ -1,13 +1,12 @@
 package com.project.PlanFit.file.controller;
 
+import com.project.PlanFit.file.dto.FileAtmtDto;
 import com.project.PlanFit.file.service.FileAtmtService;
 import com.project.PlanFit.file.util.StorageUtil;
+import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,7 +15,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class CmFileController {
+public class CmFileAtmtController {
 
     private final FileAtmtService fileAtmtService;
     private final StorageUtil storageUtil;
@@ -36,5 +35,23 @@ public class CmFileController {
         Long fileId = fileAtmtService.saveFileInfo(file, result, menuType);
         // 응답 반환
         return ResponseEntity.ok(Map.of("fileId", fileId));
+    }
+
+    /**
+     * 파일 다운로드
+     * @param fileId
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/file/download/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) throws Exception {
+        // DB에서 파일 정보 조회
+        FileAtmtDto fileAtmtDto = fileAtmtService.downloadFile(fileId);
+
+        // StorageUtil로 파일 리소스 가져오기 (filePath, storedFileNm)
+        Resource fileRes = storageUtil.asResource(fileAtmtDto.getFilePath(), fileAtmtDto.getStoredFileNm());
+
+        // ResponseEntity로 반환
+        return ResponseEntity.ok(fileRes);
     }
 }

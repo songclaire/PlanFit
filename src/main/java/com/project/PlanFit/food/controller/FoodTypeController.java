@@ -1,26 +1,28 @@
 package com.project.PlanFit.food.controller;
 
-import com.project.PlanFit.food.dto.RecipeDto;
-import com.project.PlanFit.food.service.RecipeService;
-import jakarta.validation.Valid;
+import com.project.PlanFit.food.dto.FoodTypeDto;
+import com.project.PlanFit.food.service.FoodTypeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/recipe")
-public class RecipeController {
+@RequestMapping("/api/foodType")
+public class FoodTypeController {
 
-    private final RecipeService recipeService;
+    private final FoodTypeService foodTypeService;
 
-    @PostMapping("/save")
-    public ResponseEntity<RecipeDto> saveRecipe(@RequestBody @Valid RecipeDto dto) {
-        RecipeDto saved = recipeService.saveRecipe(dto);
-        return ResponseEntity.ok(saved);
+    /**
+     * 음식종류 데이터 호출 (레시피 추가 모달)
+     * @return
+     */
+    @GetMapping(path = "/list")
+    public List<FoodTypeDto> selectFoodTypeList() {
+        List<FoodTypeDto> list = foodTypeService.selectFoodTypeList();
+        return list;
     }
-
 }

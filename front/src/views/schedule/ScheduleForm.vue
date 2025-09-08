@@ -109,8 +109,6 @@ const props = defineProps({
     }
 })
 
-console.log('props????', props)
-
 const form = ref({
     schdSn: '',
     schdTypeSn: '',

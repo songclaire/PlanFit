@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,6 +23,7 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
@@ -36,10 +39,12 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();           // ✅ 프리플라이트 허용
-                    auth.requestMatchers("/api/login", "/api/signup").permitAll();         // ✅ 로그인/회원가입 허용
-                    auth.anyRequest().authenticated();                                               // ✅ 나머진 인증 필요
+                    auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();                            // ✅ 프리플라이트 허용
+                    auth.requestMatchers("/api/login", "/api/signup").permitAll();                          // ✅ 로그인/회원가입 허용
+                    auth.requestMatchers(HttpMethod.GET, "/api/file/download/**").permitAll();
+                    auth.anyRequest().authenticated();                                                                // ✅ 나머진 인증 필요
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
