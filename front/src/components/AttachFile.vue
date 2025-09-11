@@ -80,6 +80,10 @@ const props = defineProps({
     maxSizeMB: {
         type: Number,
         default: 10
+    },
+    menuType: {
+        type: String,
+        required: true
     }
 })
 
@@ -145,7 +149,7 @@ const uploadFile = async (file) => {
 
         const formData = new FormData()
         formData.append('file', file)
-        formData.append('menuType', 'RECIPE')
+        formData.append('menuType', props.menuType)
 
         // axios 사용
         const response = await axios.post('/api/file/upload', formData)

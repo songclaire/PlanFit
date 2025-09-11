@@ -28,6 +28,6 @@ app.use(Quasar, {
 })
 
 const token = localStorage.getItem('accessToken')
-if (token) axios.defaults.headers.common.Authorization = `Bearer ${token}`
+//if (token) axios.defaults.headers.common.Authorization = `Bearer ${token}`
 
 app.mount('#app')

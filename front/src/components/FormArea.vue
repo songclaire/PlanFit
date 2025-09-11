@@ -135,10 +135,9 @@
                                 v-model="field.value"
                                 :accept="field.accept || 'image/*'"
                                 :max-size-m-b="field.maxSizeMB || 5"
+                                v-bind="field.props || {}"
                             />
                         </template>
-
-
 
                         <!-- 필드 버튼들 -->
                         <div v-if="field.buttons" class="field-buttons">

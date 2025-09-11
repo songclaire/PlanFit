@@ -28,7 +28,6 @@ public class CmFileAtmtController {
      */
     @PostMapping("/file/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("menuType") String menuType) throws IOException {
-
         // 파일 저장
         StorageUtil.Saved result = storageUtil.save(file);
         // db에 메타정보 저장

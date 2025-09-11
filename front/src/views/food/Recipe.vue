@@ -38,6 +38,7 @@ import TableArea from '../../components/TableArea.vue'
 import FormArea from '../../components/FormArea.vue'
 import SearchArea from '../../components/SearchArea.vue'
 import { useFormArea } from '../../components/useFormArea.js'
+import { MenuTypes } from '@/constants/menuTypes.js'
 
 import axios from 'axios'
 
@@ -74,12 +75,10 @@ const recipeSearch = ref({
     ],
     events: {
         SUBMIT(evt) {
-            console.log('조회 도착!', evt)
             recipeTable.value.search = evt?.value || {}
             recipeTable.value.getList?.()
         },
         RESET() {
-            console.log('초기화 도착!')
             recipeTable.value.search = {}
             recipeTable.value.getList?.()
         }
@@ -87,10 +86,10 @@ const recipeSearch = ref({
 })
 
 const star = v => {
-  const n = Math.max(0, Math.min(5, Number(v) || 0))
-  const filled = '<span style="color:#FFD700">★</span>'.repeat(n)
-  const empty  = '<span style="color:#ddd">☆</span>'.repeat(5 - n)
-  return filled + empty
+    const n = Math.max(0, Math.min(5, Number(v) || 0))
+    const filled = '<span style="color:#FFD700">★</span>'.repeat(n)
+    const empty  = '<span style="color:#ddd">☆</span>'.repeat(5 - n)
+    return filled + empty
 }
 
 /**
@@ -147,7 +146,16 @@ const recipeForm = useFormArea({
         { label: '레시피내용', name: 'recipeCn', type: 'textarea', required: true },
         { label: '난이도', name: 'difficulty', type: 'star-rating', required: true },
         { label: '요리날짜', name: 'recipeDate', type: 'date', required: true, value: new Date().toISOString().split('T')[0] },
-        { label: '이미지', name: 'fileId', type: 'file', value: '', accept: 'image/*', maxSizeMB: 50, required: true }
+        {
+            label: '이미지',
+            name: 'fileId',
+            type: 'file',
+            value: '',
+            accept: 'image/*',
+            maxSizeMB: 50,
+            required: true,
+            props: { menuType: MenuTypes.RECIPE }
+        }
     ],
 })
 

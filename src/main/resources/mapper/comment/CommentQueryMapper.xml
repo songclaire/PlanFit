@@ -1,0 +1,23 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.PlanFit.comment.mapper.CommentQueryMapper">
+    <select id="findCommentsByMenu" resultType="com.project.PlanFit.comment.dto.CommentDto">
+        SELECT
+            COMMENT_ID   AS commentId,
+            PARENT_ID    AS parentId,
+            REG_ID       AS userId,
+            COMMENT_CN   AS commentCn,
+            REG_DT       AS regDt,
+            REG_ID       AS regId,
+            MENU_TYPE    AS menuType,
+            MENU_ID      AS menuId,
+            DEL_YN       AS delYn
+        FROM COMMENTS
+        WHERE MENU_TYPE = #{menuType}
+        AND MENU_ID   = #{menuId}
+        AND COALESCE(DEL_YN,'N') = 'N'
+        ORDER BY
+            CASE WHEN PARENT_ID IS NULL THEN COMMENT_ID ELSE PARENT_ID END,
+            REG_DT ASC
+    </select>
+</mapper>
