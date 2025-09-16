@@ -1,15 +1,19 @@
 package com.project.PlanFit.user.service;
 
+import com.project.PlanFit.file.repository.FileAtmtRepository;
 import com.project.PlanFit.user.dto.UserDto;
 import com.project.PlanFit.user.entity.User;
 import com.project.PlanFit.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +21,7 @@ public class UserService {
 
     public final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileAtmtRepository fileAtmtRepository;
 
     // 토큰
     public User validateUser(String userId, String password) {
@@ -55,5 +60,52 @@ public class UserService {
         return ResponseEntity.ok(Map.of(
                 "userName", user.getUserName()
         ));
+    }
+
+    /**
+     * 유저 정보 호출
+     */
+    public UserDto selectUserInfo(String userId) {
+        User user = userRepository.findById(userId)   // PK가 userId일 경우
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        UserDto dto = new UserDto();
+        dto.setUserId(user.getUserId());
+        dto.setUserName(user.getUserName());
+        dto.setEmail(user.getEmail());
+        dto.setTelNo(user.getTelNo());
+        dto.setRoadNmAddr(user.getRoadNmAddr());
+        dto.setRoadNmDaddr(user.getRoadNmDaddr());
+        dto.setFileId(user.getFileId());
+
+        return dto;
+    }
+
+    @Transactional
+    public UserDto updateUserInfo(String targetUsreId, UserDto dto) throws NotFoundException {
+        User userInfo = userRepository.findById(dto.getUserId())
+                                .orElseThrow(() -> new NotFoundException("user"));
+        // 기존에 첨부파일이 있을 경우
+        Long oldFileId = userInfo.getFileId();
+        Long newFileId = dto.getFileId();
+
+        // 필드 업데이트
+        userInfo.patchProfile(
+                dto.getUserName(),
+                dto.getEmail(),
+                dto.getTelNo(),
+                dto.getRoadNmAddr(),
+                dto.getRoadNmDaddr(),
+                newFileId
+        );
+
+        // 파일 업데이트
+        if (!Objects.equals(oldFileId, newFileId)) {
+            if (newFileId != null) {
+                fileAtmtRepository.updateTmprStrgYn(newFileId);
+            }
+        }
+        return UserDto.fromEntity(userInfo);
+
     }
 }

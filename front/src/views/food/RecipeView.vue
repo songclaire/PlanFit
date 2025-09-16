@@ -47,6 +47,17 @@
                         :key="c.commentId"
                         :style="{ marginLeft: (c.parentId ? 16 : 0) + 'px' }">
                         <div class="cmt__item-header">
+                            <span class="cmt__avatar">
+                                <img
+                                    v-if="c.fileId && !avatarErr[c.regId]"
+                                    :src="`/api/file/download/${c.fileId}`"
+                                    alt="avatar"
+                                    @error="() => onAvatarError(c.regId)"
+                                />
+                                <span v-else class="cmt__avatar-initials">
+                                    {{ initialsOf(c.userName || c.regId) }}
+                                </span>
+                            </span>
                             <span class="cmt__user-id">{{ c.regId }}</span>
                             <span class="cmt__date">{{ c.regDt }}</span>
                         </div>
@@ -92,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import FormArea from '../../components/FormArea.vue'   // FormArea 사용
@@ -110,6 +121,21 @@ const replyText = ref('')
 // 댓글 수정
 const editTargetId = ref(null)
 const editText = ref('')
+// 댓글 이미지 로딩 실패 여부
+const avatarErr = reactive({})
+
+// 이미지 실패 핸들러
+function onAvatarError(userId) {
+    if (userId) avatarErr[userId] = true
+}
+
+// 이름이나 아이디에서 이니셜 생성
+function initialsOf(nameOrId) {
+    const s = String(nameOrId || '').trim()
+    if (!s) return 'NA'
+    const clean = s.replace(/[^\p{L}\p{N}]/gu, '')
+    return clean.slice(0, 2).toUpperCase()
+}
 
 // 수정-취소시 데이터 백업용
 const originalDetail = ref(null)
@@ -534,7 +560,7 @@ onMounted(() => {
 }
 .cmt__input {
     width: 100%;
-    min-height: 72px;
+    min-height: 20px;
     border: none;
     resize: vertical;
     outline: none;
@@ -591,7 +617,6 @@ onMounted(() => {
 .cmt__item-header {
     display: flex;
     align-items: center;
-    margin-bottom: 6px;
 }
 .cmt__date {
     margin-left: auto;
@@ -604,6 +629,7 @@ onMounted(() => {
     color: #0f172a;
     line-height: 1.6;
     white-space: pre-wrap;
+    margin-left: 49px;
 }
 
 /* 액션 버튼 */
@@ -798,6 +824,29 @@ onMounted(() => {
     border-color: #4b5563;
 }
 
+.cmt__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;       /* 아바타 너비 */
+    height: 40px;      /* 아바타 높이 */
+    border-radius: 50%;/* 원형 */
+    overflow: hidden;
+    background: #e5e7eb; /* 사진 없을 때 배경 */
+    margin-right: 10px;  /* ID랑 간격 */
+}
+
+.cmt__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비율 깨지지 않게 */
+}
+
+.cmt__avatar-initials {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+}
 
 </style>
 

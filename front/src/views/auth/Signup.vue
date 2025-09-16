@@ -82,11 +82,9 @@ const handleSignup = async () => {
               roadNmAddr: roadNmAddr.value,
               roadNmDaddr: roadNmDaddr.value,
         })
-        console.log('성공!', response.data)
         alert('회원가입 완료')
         router.push('/')
     } catch (err) {
-        console.error('에러', err)
         alert('회원가입 실패')
     }
 }

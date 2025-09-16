@@ -20,4 +20,18 @@ public class UserDto extends BaseDto {
     private String roadNmDaddr;
     private LocalDateTime joinDt;
     private LocalDateTime whdwlDt;
+    private Long fileId;
+
+    public static UserDto fromEntity(com.project.PlanFit.user.entity.User u) {
+        UserDto d = new UserDto();
+        d.setUserId(u.getUserId());
+        d.setUserName(u.getUserName());
+        d.setEmail(u.getEmail());
+        d.setTelNo(u.getTelNo());
+        d.setRoadNmAddr(u.getRoadNmAddr());
+        d.setRoadNmDaddr(u.getRoadNmDaddr());
+        d.setFileId(u.getFileId());
+        return d;
+    }
+
 }

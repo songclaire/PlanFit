@@ -16,6 +16,9 @@ public class CommentDto extends BaseDto {
     private Long parentId;
     private String commentCn;
 
+    private Long fileId;
+    private String userName;
+
     public static CommentDto fromEntity(Comment entity) {
         CommentDto dto = new CommentDto();
         dto.setCommentId(entity.getCommentId());

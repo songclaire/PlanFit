@@ -56,8 +56,6 @@ public class CommentService {
      */
     @Transactional
     public CommentDto updateComment(@Valid CommentDto dto) {
-        log.info(">>> updateComment called with " + dto.getCommentId());
-
         Comment commentInfo = commentRepository.findById(dto.getCommentId())
                         .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
         commentInfo.setCommentCn(dto.getCommentCn());

@@ -3,21 +3,24 @@
 <mapper namespace="com.project.PlanFit.comment.mapper.CommentQueryMapper">
     <select id="findCommentsByMenu" resultType="com.project.PlanFit.comment.dto.CommentDto">
         SELECT
-            COMMENT_ID   AS commentId,
-            PARENT_ID    AS parentId,
-            REG_ID       AS userId,
-            COMMENT_CN   AS commentCn,
-            REG_DT       AS regDt,
-            REG_ID       AS regId,
-            MENU_TYPE    AS menuType,
-            MENU_ID      AS menuId,
-            DEL_YN       AS delYn
-        FROM COMMENTS
+            A.COMMENT_ID   AS commentId,
+            A.PARENT_ID    AS parentId,
+            A.REG_ID       AS userId,
+            A.COMMENT_CN   AS commentCn,
+            A.REG_DT       AS regDt,
+            A.REG_ID       AS regId,
+            A.MENU_TYPE    AS menuType,
+            A.MENU_ID      AS menuId,
+            A.DEL_YN       AS delYn,
+            B.USER_NAME    AS userName,
+            B.FILE_ID 	   AS fileId
+        FROM COMMENTS A
+        INNER JOIN USER B ON A.REG_ID = B.USER_ID
         WHERE MENU_TYPE = #{menuType}
         AND MENU_ID   = #{menuId}
-        AND COALESCE(DEL_YN,'N') = 'N'
+        AND COALESCE(A.DEL_YN,'N') = 'N'
         ORDER BY
             CASE WHEN PARENT_ID IS NULL THEN COMMENT_ID ELSE PARENT_ID END,
-            REG_DT ASC
+            A.REG_DT ASC
     </select>
 </mapper>

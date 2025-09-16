@@ -2,7 +2,7 @@
 <template>
     <div class="attach-file">
         <!-- 파일이 있을 때 미리보기 -->
-        <div v-if="fileId && !uploading" class="file-preview">
+        <div v-if="showPreview && fileId && !uploading" class="file-preview">
             <img
                 :src="fileUrl"
                 :alt="fileName"
@@ -43,7 +43,24 @@
                 :disabled="uploading"
             />
 
-            <div class="upload-area" @click="triggerFileSelect">
+            <button
+                v-if="ui === 'button'"
+                type="button"
+                class="btn btn-outline"
+                :disabled="disabled || uploading"
+                @click="triggerFileSelect"
+            >
+                {{ label }}<span v-if="uploading"> (업로드 중…)</span>
+            </button>
+
+            <!-- 수정: 드롭존 모드(버튼 모드일 땐 렌더 안 함) -->
+            <div
+                v-else
+                class="upload-area"
+                @click="triggerFileSelect"
+                @dragover.prevent="handleDragOver"
+                @drop.prevent="handleDrop"
+            >
                 <div v-if="uploading" class="uploading">
                     <div class="spinner"></div>
                     <span>업로드 중...</span>
@@ -84,6 +101,18 @@ const props = defineProps({
     menuType: {
         type: String,
         required: true
+    },
+    ui: {
+        type: String,
+        default: 'dropzone'
+    },
+    label: {
+        type: String,
+        default: '사진 추가'
+    },
+    disabled: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -112,9 +141,7 @@ watch(() => props.modelValue, (newValue) => {
 
 // 파일 선택 트리거
 const triggerFileSelect = () => {
-    if (!uploading.value) {
-        fileInput.value?.click()
-    }
+    if (!uploading.value) fileInput.value?.click()
 }
 
 // 파일 선택 처리

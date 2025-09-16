@@ -4,12 +4,14 @@ import Home from '../views/Home.vue';
 import authRoutes from '../views/auth/router';
 import scheduleRoutes from '../views/schedule/router';
 import foodRoutes from '../views/food/router';
+import myPageRoutes from '../views/mypage/router';
 
 const routes = [
   { path: '/', component: Home },
   ...authRoutes,
   ...scheduleRoutes,
   ...foodRoutes,
+  ...myPageRoutes,
 ];
 
 const router = createRouter({
