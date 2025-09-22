@@ -21,6 +21,7 @@ public class UserDto extends BaseDto {
     private LocalDateTime joinDt;
     private LocalDateTime whdwlDt;
     private Long fileId;
+    private Boolean isAdmin;
 
     public static UserDto fromEntity(com.project.PlanFit.user.entity.User u) {
         UserDto d = new UserDto();

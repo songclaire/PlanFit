@@ -5,6 +5,7 @@ import authRoutes from '../views/auth/router';
 import scheduleRoutes from '../views/schedule/router';
 import foodRoutes from '../views/food/router';
 import myPageRoutes from '../views/mypage/router';
+import adminRoutes from '../views/admin/router';
 
 const routes = [
   { path: '/', component: Home },
@@ -12,6 +13,7 @@ const routes = [
   ...scheduleRoutes,
   ...foodRoutes,
   ...myPageRoutes,
+  ...adminRoutes,
 ];
 
 const router = createRouter({

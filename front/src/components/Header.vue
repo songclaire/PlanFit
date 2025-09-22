@@ -11,6 +11,7 @@
         <router-link to="/trip" @click.native.prevent="goIfLogin('/trip')"> 여행 </router-link>
         <router-link to="/food" @click.native.prevent="goIfLogin('/food')"> 식단 </router-link>
         <router-link to="/mypage" @click.native.prevent="goIfLogin('/mypage')"> 마이페이지 </router-link>
+        <router-link v-if="roles.includes('admin')" to="/admin" @click.native.prevent="goIfLogin('/admin')"> 관리자페이지 </router-link>
       </nav>
 
       <!-- 우측 로그인 -->
@@ -35,6 +36,7 @@ import { useRouter } from 'vue-router'
 
 const isLogin = ref(false)
 const userName = ref('')
+const roles = ref([])
 const router = useRouter()
 
 function checkAuth() {
@@ -42,6 +44,7 @@ function checkAuth() {
   if (token) {
     isLogin.value = true
     userName.value = localStorage.getItem('userName') || '사용자'
+    roles.value = JSON.parse(localStorage.getItem('roles') || "[]")
   } else {
     isLogin.value = false
     userName.value = ''
@@ -65,13 +68,16 @@ onMounted(() => {
   window.addEventListener('login-success', () => {
     isLogin.value = true
     userName.value = localStorage.getItem('userName') || '사용자'
+    roles.value = JSON.parse(localStorage.getItem('roles') || '[]')
   })
 })
 
 const logout = () => {
     localStorage.removeItem('accessToken')
     localStorage.removeItem('userName')
+    localStorage.removeItem('roles')
     isLogin.value = false
+    roles.value = []
     router.push('/')
 }
 

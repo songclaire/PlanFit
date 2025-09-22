@@ -5,7 +5,7 @@ import router from './router'
 import axios from 'axios'
 
 import 'quasar/src/css/index.sass'
-import { Quasar } from 'quasar'
+import { Quasar, Notify } from 'quasar'
 import quasarLang from 'quasar/lang/ko-KR'
 import '@quasar/extras/material-icons/material-icons.css'
 
@@ -23,7 +23,7 @@ axios.interceptors.request.use(config => {
 const app = createApp(App)
 app.use(router)
 app.use(Quasar, {
-  plugins: {}, // 필요한 플러그인 넣을 수 있음
+  plugins: { Notify }, // 필요한 플러그인 넣을 수 있음
   lang: quasarLang
 })
 

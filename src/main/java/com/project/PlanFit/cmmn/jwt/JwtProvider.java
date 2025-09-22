@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtProvider {
@@ -28,17 +29,29 @@ public class JwtProvider {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    // JWT 토큰 생성
-    public String createToken(String userId) {
+    // JWT 토큰 생성 (권한 추가)
+    public String createToken(String userId, List<String> roles) {
         Date now = new Date();
         Date expire = new Date(now.getTime() + TOKEN_VALID_TIME);
 
         return Jwts.builder()
                 .setSubject(userId)
+                .claim("roles", roles)
                 .setIssuedAt(now)
                 .setExpiration(expire)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // 권한 추가하여 'Role' 추출 메서드 필요
+    @SuppressWarnings("unchecked")
+    public List<String> getRoles(String token) {
+        return (List<String>) Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("roles", List.class);
     }
 
     public String getUserId(String token) {

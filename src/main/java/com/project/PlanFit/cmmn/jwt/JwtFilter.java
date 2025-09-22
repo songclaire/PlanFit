@@ -45,13 +45,17 @@ public class JwtFilter extends OncePerRequestFilter {
         // 2. 토큰이 존재하고, 유효하면
         if (token != null && jwtProvider.validateToken(token)) {
 
-            // 3. 토큰에서 userId 추출
+            // 3. 토큰에서 userId 추출 + 권한 주입 (로그인하면서 AuthController > JwtProvider에서 만든 getRole 호출해서 역할 roles에 주입)
             String userId = jwtProvider.getUserId(token);
+            List<String> roles = jwtProvider.getRoles(token);
+            var authorities = (roles == null || roles.isEmpty() ? List.<String>of("USER") : roles)
+                    .stream()
+                    .map(r -> new SimpleGrantedAuthority("ROLE_" + r.toUpperCase()))
+                    .toList();
 
             // 4. 인증 객체 생성
             UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(userId, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
-                    );
+                    new UsernamePasswordAuthenticationToken(userId, null, authorities);
 
             // 5. SecurityContext에 등록 → 이 요청은 "로그인된 사용자"로 인식됨
             SecurityContextHolder.getContext().setAuthentication(auth);

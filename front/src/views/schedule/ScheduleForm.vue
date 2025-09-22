@@ -119,15 +119,15 @@ const form = ref({
     location: '',
     ptcptTypeNm: '',
     schdPtcptSn: '',
-    color: '#4F86C6'
+    color: '#AFCBEF'
 })
 
 const colorOptions = [
-  { value: '#4F86C6', label: '파스텔 블루' },
-  { value: '#81C784', label: '세이지 그린' },
-  { value: '#FFD54F', label: '소프트 옐로우' },
-  { value: '#FF8A65', label: '살구 오렌지' },
-  { value: '#BA68C8', label: '라벤더 퍼플' }
+  { value: '#AFCBEF', label: '파스텔 블루' },
+  { value: '#C8E6C9', label: '세이지 그린' },
+  { value: '#FFF59D', label: '소프트 옐로우' },
+  { value: '#FFCCBC', label: '살구 오렌지' },
+  { value: '#E1BEE7', label: '라벤더 퍼플' }
 ]
 
 // 일정 종류 목록

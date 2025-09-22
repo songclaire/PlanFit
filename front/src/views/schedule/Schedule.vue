@@ -50,7 +50,8 @@ const calendarOptions = ref ({
     initialView: 'dayGridMonth',
     events,
     eventClick: handleEventClick,
-    dateClick: handleDateClick
+    dateClick: handleDateClick,
+    eventBorderColor: '#e0e0e0',
 })
 
 /**
@@ -88,7 +89,9 @@ async function selectSchdList() {
             title: item.schdTtl,
             start: item.startDt,
             end: addOneDay(item.endDt),
-            backgroundColor: item.color
+            backgroundColor: item.color,
+            borderColor: item.color,
+            textColor: '#333333'
         }))
     } catch (err) {
         console.error('등록 실패', err)
@@ -107,7 +110,8 @@ function addEventToCalendar(newEvent) {
         title: newEvent.schdTtl,
         start: newEvent.startDt,
         end: addOneDay(newEvent.endDt),
-        backgroundColor: newEvent.color
+        backgroundColor: newEvent.color,
+        borderColor: newEvent.color
     }
 
     // 이미 등록된 건을 수정하는 경우

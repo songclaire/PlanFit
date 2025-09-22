@@ -35,10 +35,11 @@ const handleLogin = async () => {
         // AuthController에서 보낸 token 겟
         const token = res.data.token;
 
-        // JWT 토큰을 localStorage에 저장
+        // JWT 토큰을 localStorage에 저장 + 권한
         localStorage.setItem('accessToken', token);
         localStorage.setItem('userId', userId.value);
         localStorage.setItem('userName', res.data.userName);
+        localStorage.setItem('roles', JSON.stringify(res.data.roles));
 
          // ⭐ 로그인 성공 시 로그인 상태 reactive 상태 변경 (event 또는 전역 상태 필요)
         window.dispatchEvent(new Event('login-success'))

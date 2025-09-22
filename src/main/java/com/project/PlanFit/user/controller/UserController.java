@@ -11,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -39,4 +41,14 @@ public class UserController {
         return ResponseEntity.ok(updated);
     }
 
+    @PostMapping(name = "유저 목록 조회", path = "/memberList")
+    public List<UserDto> selectUserList(@RequestBody(required = true) UserDto dto) {
+        return userService.selectUserList(dto);
+    }
+
+    @PostMapping(name = "유저 권한 변경", path = "/adminRole")
+    public ResponseEntity<Void> updateAdminRole(@RequestBody UserDto dto) {
+        userService.updateAdminRole(dto);
+        return ResponseEntity.ok().build();
+    }
 }

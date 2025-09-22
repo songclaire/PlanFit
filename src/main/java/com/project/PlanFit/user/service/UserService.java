@@ -1,6 +1,8 @@
 package com.project.PlanFit.user.service;
 
 import com.project.PlanFit.file.repository.FileAtmtRepository;
+import com.project.PlanFit.role.entity.UserRole;
+import com.project.PlanFit.role.repository.UserRoleRepository;
 import com.project.PlanFit.user.dto.UserDto;
 import com.project.PlanFit.user.entity.User;
 import com.project.PlanFit.user.repository.UserRepository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -22,6 +25,7 @@ public class UserService {
     public final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileAtmtRepository fileAtmtRepository;
+    private final UserRoleRepository userRoleRepository;
 
     // 토큰
     public User validateUser(String userId, String password) {
@@ -39,7 +43,10 @@ public class UserService {
         return user;
     }
 
-
+    /**
+     * 회원가입
+     */
+    @Transactional
     public ResponseEntity<?> signup(UserDto dto) {
 
         // 1. UserDto → User로 변환
@@ -56,6 +63,19 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+
+        // 2. USER_ROLE 저장
+        userRoleRepository.save(
+                UserRole.builder()
+                        .userId(user.getUserId())
+                        .roleId(2)
+                        .delYn("N")
+                        .regId(user.getUserId())
+                        .mdfrId(user.getUserId())
+                        .regDt(LocalDateTime.now())
+                        .mdfcnDt(LocalDateTime.now())
+                        .build()
+        );
 
         return ResponseEntity.ok(Map.of(
                 "userName", user.getUserName()
@@ -81,6 +101,9 @@ public class UserService {
         return dto;
     }
 
+    /**
+     * 유저 정보 수정
+     */
     @Transactional
     public UserDto updateUserInfo(String targetUsreId, UserDto dto) throws NotFoundException {
         User userInfo = userRepository.findById(dto.getUserId())
@@ -107,5 +130,23 @@ public class UserService {
         }
         return UserDto.fromEntity(userInfo);
 
+    }
+
+    /**
+     * 유저 목록 조회
+     */
+    @Transactional
+    public List<UserDto> selectUserList(UserDto dto) {
+        return userRepository.selectUserList(dto);
+    }
+
+    /**
+     * 유저 권한 변경
+     */
+    @Transactional
+    public void updateAdminRole(UserDto dto) {
+        Long curRoleId = userRoleRepository.findRoleIdByUserId(dto.getUserId());
+        Long next = (curRoleId != null && curRoleId == 1L) ? 2L : 1L;
+        userRoleRepository.updateRoleId(dto.getUserId(), next);
     }
 }

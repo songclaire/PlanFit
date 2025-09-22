@@ -44,6 +44,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();                            // ✅ 프리플라이트 허용
                     auth.requestMatchers("/api/login", "/api/signup").permitAll();                          // ✅ 로그인/회원가입 허용
                     auth.requestMatchers(HttpMethod.GET, "/api/file/download/**").permitAll();
+                    auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
                     auth.anyRequest().authenticated();                                                                // ✅ 나머진 인증 필요
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
