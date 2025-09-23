@@ -1,34 +1,33 @@
 <template>
-  <div>
-    <div class="recipe-header">
-      <h3>레시피 목록</h3>
-      <button class="add-button" @click="handleAddRecipe">+ 레시피 추가</button>
+    <div>
+        <div class="recipe-header">
+            <h3>레시피 목록</h3>
+            <button class="add-button" @click="handleAddRecipe">+ 레시피 추가</button>
+        </div>
+        <SearchArea v-model="recipeSearch"/>
+        <TableArea v-model="recipeTable">
+            <template #cell-thumb="{ row }">
+                <img :src="`/api/file/download/${row.fileId}`" alt="thumb" class="thumb"
+                     @error="e => e.target.style.display = 'none'" />
+            </template>
+        </TableArea>
+
+        <!-- 레시피 추가 모달 -->
+        <q-dialog v-model="showAddModal" persistent>
+            <q-card style="min-width: 500px;">
+                <q-card-section class="row items-center q-pb-none">
+                    <div class="text-h6">🫒 레시피 추가 🫒</div>
+                    <q-space />
+                    <q-btn icon="close" flat round dense v-close-popup />
+                </q-card-section>
+
+                <q-card-section>
+                    <!-- FormArea로 교체 -->
+                    <FormArea v-model="recipeForm" @success="onCreated" />
+                </q-card-section>
+            </q-card>
+        </q-dialog>
     </div>
-    <SearchArea v-model="recipeSearch"/>
-    <TableArea v-model="recipeTable">
-      <template #cell-thumb="{ row }">
-        <img :src="`/api/file/download/${row.fileId}`" alt="thumb" class="thumb"
-             @error="e => e.target.style.display = 'none'" />
-      </template>
-    </TableArea>
-
-    <!-- 레시피 추가 모달 -->
-    <q-dialog v-model="showAddModal" persistent>
-      <q-card style="min-width: 500px;">
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">🫒 레시피 추가 🫒</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-
-        <q-card-section>
-          <!-- FormArea로 교체 -->
-          <FormArea v-model="recipeForm" @success="onCreated" />
-        </q-card-section>
-
-      </q-card>
-    </q-dialog>
-  </div>
 </template>
 
 <script setup>
@@ -99,9 +98,9 @@ const recipeTable = ref({
     url: '/api/recipe/list',
     columns: [
         {
-          name: 'thumb', label: '', align: 'center',
-          headerStyle:'width:80px;min-width:80px;max-width:50px;padding:80',
-          style:'width:80px;min-width:180px;max-width:80px;padding:80'
+            name: 'thumb', label: '', align: 'center',
+            headerStyle:'width:80px;min-width:80px;max-width:50px;padding:80',
+            style:'width:80px;min-width:180px;max-width:80px;padding:80'
         },
         { name: 'typeNm', label: '음식종류명', align: 'center' },
         { name: 'recipeNm', label: '레시피명', align: 'center'  },
@@ -126,7 +125,7 @@ const recipeTable = ref({
 })
 
 /**
- * 레시피 등록 폼
+ * 레시피 등록 폼 (레시피 추가)
  */
 const recipeForm = useFormArea({
     name: 'recipeForm',
@@ -204,30 +203,29 @@ function onCreated(created) {
     showAddModal.value = false
     tableKey.value++
 }
-
 </script>
 
 <style scoped>
 .thumb{
-  width: 100px;
-  height: 100px;
-  border-radius: 6px;
-  object-fit: cover;
-  display: block; margin: 0 auto;
+    width: 100px;
+    height: 100px;
+    border-radius: 6px;
+    object-fit: cover;
+    display: block; margin: 0 auto;
 }
 
 .recipe-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 
-  /* SearchArea/TableArea와 동일한 폭 & 정렬 */
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 8px; /* 양옆 여백 조금 주면 라인감 딱 맞음 */
-  box-sizing: border-box;
+    /* SearchArea/TableArea와 동일한 폭 & 정렬 */
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 8px; /* 양옆 여백 조금 주면 라인감 딱 맞음 */
+    box-sizing: border-box;
 }
 
 .recipe-header h3 {
@@ -237,48 +235,47 @@ function onCreated(created) {
     color: #333;
 }
 
-/* 상단 네이티브 .add-button만 교체 */
 /* 레시피 추가 버튼 (코럴 오렌지 계열) */
 .add-button {
-  background-color: #f97316;   /* 오렌지-코럴 */
-  border: 1px solid #f97316;
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
-  transition: background-color .15s ease, box-shadow .15s ease;
+    background-color: #f97316;   /* 오렌지-코럴 */
+    border: 1px solid #f97316;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
+    transition: background-color .15s ease, box-shadow .15s ease;
 }
 .add-button:hover {
-  background-color: #ea580c;   /* hover 시 살짝 진하게 */
-  box-shadow: 0 3px 8px rgba(234, 88, 12, 0.28);
+    background-color: #ea580c;   /* hover 시 살짝 진하게 */
+    box-shadow: 0 3px 8px rgba(234, 88, 12, 0.28);
 }
 
 /* 레시피 추가 버튼 (채도 낮춘 로지 레드) */
 .add-button {
-  background-color: #e65a54;   /* muted rosy red */
-  border: 1px solid #e65a54;
-  color: #fff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(230, 90, 84, 0.20);
-  transition: background-color .15s ease, box-shadow .15s ease;
+    background-color: #e65a54;   /* muted rosy red */
+    border: 1px solid #e65a54;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(230, 90, 84, 0.20);
+    transition: background-color .15s ease, box-shadow .15s ease;
 }
 .add-button:hover {
-  background-color: #cc4f4a;   /* 한 톤 다운 */
-  box-shadow: 0 3px 8px rgba(204, 79, 74, 0.24);
+    background-color: #cc4f4a;   /* 한 톤 다운 */
+    box-shadow: 0 3px 8px rgba(204, 79, 74, 0.24);
 }
 
 /* 조회 버튼 (딥 블루) */
 .btn-search.q-btn {
-  background-color: #2563eb;   /* primary blue */
-  border: 1px solid #1d4ed8;
-  color: #fff;
-  border-radius: 8px;
-  font-weight: 600;
-  padding: 6px 16px;
-  box-shadow: 0 1.5px 4px rgba(37, 99, 235, 0.18);
+    background-color: #2563eb;   /* primary blue */
+    border: 1px solid #1d4ed8;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 6px 16px;
+    box-shadow: 0 1.5px 4px rgba(37, 99, 235, 0.18);
 }
 .btn-search.q-btn:hover { background-color: #1d4ed8; }
 </style>
