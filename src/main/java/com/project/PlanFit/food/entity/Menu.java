@@ -28,15 +28,10 @@ public class Menu extends BaseEntity {
     @Column(name = "PRICE")
     private BigDecimal price;
 
-    @Column(name = "RATING")
-    private Integer rating;
-
     @Column(name = "RCMD_YN")
     private String rcmdYn;
 
     @Column(name = "FILE_ID")
     private Long fileId;
 
-    @Column(name = "MEMO")
-    private String memo;
 }

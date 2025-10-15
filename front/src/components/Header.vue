@@ -9,7 +9,7 @@
         <router-link to="/schedule" @click.native.prevent="goIfLogin('/schedule')"> 일정 </router-link>
         <router-link to="/learn" @click.native.prevent="goIfLogin('/learn')"> 학습 </router-link>
         <router-link to="/trip" @click.native.prevent="goIfLogin('/trip')"> 여행 </router-link>
-        <router-link to="/food" @click.native.prevent="goIfLogin('/food')"> 식단 </router-link>
+        <router-link to="/food" @click.native.prevent="goIfLogin('/food')"> 음식 </router-link>
         <router-link to="/mypage" @click.native.prevent="goIfLogin('/mypage')"> 마이페이지 </router-link>
         <router-link v-if="roles.includes('admin')" to="/admin" @click.native.prevent="goIfLogin('/admin')"> 관리자페이지 </router-link>
       </nav>

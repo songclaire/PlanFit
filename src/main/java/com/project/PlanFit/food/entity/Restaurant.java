@@ -4,6 +4,8 @@ import com.project.PlanFit.cmmn.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "RESTAURANT")
 @Getter @Setter
@@ -41,12 +43,18 @@ public class Restaurant extends BaseEntity {
     @Column(name = "FILE_ID")
     private Long fileId;
 
-    @Column(name = "LATITUDE", precision = 10, scale = 7)
-    private Double latitude;
+    @Column(precision = 10, scale = 7)
+    private BigDecimal latitude;
 
-    @Column(name = "LONGITUDE", precision = 10, scale = 7)
-    private Double longitude;
+    @Column(precision = 10, scale = 7) 
+    private BigDecimal longitude;
 
     @Column(name = "KAKAO_PLACE_ID", length = 64)
     private String kakaoPlaceId;
+
+    @Column(name = "RATING")
+    private Integer rating;
+
+    @Column(name = "MEMO")
+    private String memo;
 }

@@ -14,8 +14,7 @@ public class MenuDto extends BaseDto {
 
     private String menuNm;       // 메뉴명
     private BigDecimal price;    // 가격
-    private Integer rating;      // 만족도
     private String rcmdYn;       // 추천여부
     private Long fileId;         // 파일아이디
-    private String memo;         // 메모
+
 }

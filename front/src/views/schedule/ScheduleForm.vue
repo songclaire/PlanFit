@@ -156,6 +156,7 @@ async function submitForm() {
             alert('일정이 수정되었습니다')
         } else {
             await axios.post('/api/saveSchd', form.value)
+            console.log('완료!')
             alert('일정이 등록되었습니다')
         }
 

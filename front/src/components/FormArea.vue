@@ -13,7 +13,12 @@
                     v-for="field in config.fields"
                     :key="field.name"
                     class="form-field"
-                    :class="{ 'field-error': (field.errors?.length || 0) > 0 }"
+                    :class="[
+                        { 'field-error': (field.errors?.length || 0) > 0 },
+                        colClass(field.cols),
+                        colSmClass(field.colsSm),
+                        colMdClass(field.colsMd)
+                    ]"
                     v-show="field.show !== false"
                 >
                     <!-- 라벨 -->
@@ -279,6 +284,12 @@ export default {
             return field ? field.label : fieldName
         }
 
+        const GRID = 12
+        const clamp = (n) => Math.min(GRID, Math.max(1, Number(n) || GRID))
+        const colClass   = (n) => `col-${clamp(n || 12)}`
+        const colSmClass = (n) => n ? `col-sm-${clamp(n)}` : ''
+        const colMdClass = (n) => n ? `col-md-${clamp(n)}` : ''
+
         return {
             config,
             handleSubmit,
@@ -286,7 +297,10 @@ export default {
             handleFieldButtonClick,
             handleCustomButtonClick,
             getButtonLabel,
-            getFieldLabel
+            getFieldLabel,
+            colClass,
+            colSmClass,
+            colMdClass
         }
     }
 }
@@ -311,12 +325,13 @@ export default {
 .form-fields {
     display: grid;
     gap: 16px;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
 .form-field {
     display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 10px;
+    grid-template-columns: 100px 1fr;
+    gap: 2px;
     align-items: start;
 }
 
@@ -332,7 +347,7 @@ export default {
 
 .field-input {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
 }
 
@@ -523,5 +538,29 @@ export default {
     border-radius: 6px;     /* 모서리 둥글게 유지 원치 않으면 0으로 */
 }
 
+[class^="col-"], [class*=" col-"] {
+    grid-column: span 12 / span 12;
+}
+.col-1  { grid-column: span 1 / span 1; }
+.col-2  { grid-column: span 2 / span 2; }
+.col-3  { grid-column: span 3 / span 3; }
+.col-4  { grid-column: span 4 / span 4; }
+.col-5  { grid-column: span 5 / span 5; }
+.col-6  { grid-column: span 6 / span 6; }
+.col-7  { grid-column: span 7 / span 7; }
+.col-8  { grid-column: span 8 / span 8; }
+.col-9  { grid-column: span 9 / span 9; }
+.col-10 { grid-column: span 10 / span 10; }
+.col-11 { grid-column: span 11 / span 11; }
+.col-12 { grid-column: span 12 / span 12; }
 
+@media (max-width: 1024px) {
+    .col-md-6  { grid-column: span 6 / span 6; }
+    .col-md-12 { grid-column: span 12 / span 12; }
+}
+
+@media (max-width: 768px) {
+    .col-sm-6  { grid-column: span 6 / span 6; }
+    .col-sm-12 { grid-column: span 12 / span 12; }
+}
 </style>

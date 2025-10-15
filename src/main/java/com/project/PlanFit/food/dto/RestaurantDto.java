@@ -21,5 +21,7 @@ public class RestaurantDto extends BaseDto {
     private Double latitude;     // 위도 (LATITUDE)
     private Double longitude;    // 경도 (LONGITUDE)
     private String kakaoPlaceId; // 카카오 장소 식별자 (KAKAO_PLACE_ID)
+    private Integer rating;      // 만족도
+    private String memo;         // 메모
 
 }
