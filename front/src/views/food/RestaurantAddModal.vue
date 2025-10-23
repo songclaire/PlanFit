@@ -15,6 +15,7 @@
                     <div class="left-pane">
                         <div class="search-row">
                             <q-input
+
                                 v-model="keyword"
                                 dense
                                 outlined
@@ -223,7 +224,7 @@
                                 </div>
                             </div>
 
-                            <q-btn color="primary" label="저장" class="q-mt-sm" @click="save()" />
+                            <q-btn color="primary" label="저장" class="q-mt-sm" @click="saveRestaurant()" />
                         </template>
 
                         <div v-else class="placeholder">👉 왼쪽에서 맛집을 검색해서 클릭해주세요.</div>
@@ -235,24 +236,43 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
-import { useFormArea } from '../../components/useFormArea.js'
-import FormArea from '../../components/FormArea.vue'
+import { ref, watch, nextTick, onBeforeUnmount } from 'vue'
 
 defineOptions({ name: 'RestaurantAddModal' })
-/** Props / Emits */
+
 const props = defineProps({
     modelValue: { type: Boolean, required: true },
     initialCenter: { type: Object, default: () => ({ lat: 37.5665, lng: 126.9780 }) }
 })
 const emit = defineEmits(['update:modelValue', 'saved'])
 
-/** Dialog state (v-model proxy) */
-const innerShow = ref(props.modelValue)
+/* ========== 메뉴 등록 가능 개수 ========== */
+const MAX_MENUS = 3
+
+/* ========== 핵심 데이터(저장 대상) ========== */
+// 업체 정보 (Kakao place 객체)
+const selectedPlace = ref(null)
+console.log('업체정보 selectedPlace ?????', selectedPlace)
+// 지도 좌표 { lat, lng }
+const selectedPos   = ref(null)
+console.log('지도 좌표 selectedPos ?????', selectedPos)
+// 입력 정보 (방문일자, 만족도, 메모)
+const visitInfo = ref({
+    visitDate: new Date().toISOString().split('T')[0],
+    rating: 0,
+    memo: ''
+})
+console.log('visitInfo ?????', visitInfo)
+const menuItems = ref([])                       // [{ id, name, price, file, previewUrl, recommended }]
+console.log('menuItems ?????', menuItems)
+const fileInputs = ref([])                      // 파일 input ref 배열
+
+/* ========== 화면 상태 ========== */
+const innerShow   = ref(props.modelValue)       // 다이얼로그 v-model 프록시
 watch(() => props.modelValue, v => (innerShow.value = v))
 watch(innerShow, v => emit('update:modelValue', v))
 
-/** Kakao map refs */
+/* ========== 지도/검색 상태 ========== */
 const addMapEl = ref(null)
 let addMap = null
 let addMarker = null
@@ -260,20 +280,15 @@ let addMapClickHandler = null
 let ps = null
 let markers = []
 
-/** Search state */
-const keyword = ref('')
-const results = ref([])
-const loading = ref(false)
+const keyword     = ref('')
+const results     = ref([])
+const loading     = ref(false)
 const activeIndex = ref(-1)
-const page = ref(1)
-const totalPages = ref(1)
+const page        = ref(1)
+const totalPages  = ref(1)
 let kakaoPagination = null
 
-/** Selection */
-const selectedPlace = ref(null)
-const selectedPos = ref(null) // {lat,lng}
-
-/** Open/close lifecycle */
+/* ========== 다이얼로그 열림/닫힘 ========== */
 watch(innerShow, async open => {
     if (!open) {
         cleanup()
@@ -305,7 +320,112 @@ watch(innerShow, async open => {
     })
 })
 
-function doSearch() {
+/* ========== 다이얼로그 열릴 때 최소 1개 메뉴 보장 ========== */
+watch(innerShow, open => {
+    if (open && menuItems.value.length === 0) addMenuAfter(-1)
+})
+
+/* ========== 저장/닫기/정리 ========== */
+function saveRestaurant () {
+    if (!selectedPos.value) {
+        alert('지도를 클릭하거나 검색 결과를 선택해 위치를 지정해 주세요.')
+        return
+    }
+    const invalid = menuItems.value.some(m => !m.name?.trim() || (m.price ?? -1) < 0)
+    if (invalid) {
+        alert('메뉴명과 0 이상 가격을 입력해 주세요.')
+        return
+    }
+
+    const payload = {
+        position: selectedPos.value,            // { lat, lng }
+        place: selectedPlace.value,             // Kakao place 전체
+        visitInfo: { ...visitInfo.value },      // { visitDate, rating, memo }
+        menuItems: menuItems.value.map(m => ({
+            name: m.name?.trim(),
+            price: Number(m.price ?? 0),
+            file: m.file || null,
+            recommended: !!m.recommended
+        }))
+    }
+
+    emit('saved', payload)                    // 부모에서 axios.post 처리
+    innerShow.value = false
+}
+
+function close () {
+    innerShow.value = false
+}
+
+function cleanup () {
+    try {
+        if (addMap && addMapClickHandler) {
+            window.kakao.maps.event.removeListener(addMap, 'click', addMapClickHandler)
+        }
+        clearResultMarkers()
+    } finally {
+        menuItems.value.forEach(m => m.previewUrl && URL.revokeObjectURL(m.previewUrl))
+
+        menuItems.value = []
+        fileInputs.value = []
+        visitInfo.value = { visitDate: new Date().toISOString().split('T')[0], rating: 0, memo: '' }
+        selectedPlace.value = null
+        selectedPos.value = null
+
+        results.value = []
+        kakaoPagination = null
+        page.value = 1
+        totalPages.value = 1
+
+        addMap = null
+        addMarker = null
+        addMapClickHandler = null
+    }
+}
+
+/* ========== 메뉴 조작 ========== */
+function uid () {
+    return Math.random().toString(36).slice(2, 10)
+}
+
+function addMenuAfter (index) {
+    if (menuItems.value.length >= MAX_MENUS) return
+    const newItem = {
+        id: uid(),
+        name: '',
+        price: null,
+        file: null,
+        previewUrl: '',
+        recommended: false
+    }
+    const pos = Math.max(-1, index) + 1
+    menuItems.value.splice(pos, 0, newItem)
+}
+
+function removeMenu (idx) {
+    const it = menuItems.value[idx]
+    if (it?.previewUrl) URL.revokeObjectURL(it.previewUrl)
+    menuItems.value.splice(idx, 1)
+    fileInputs.value.splice(idx, 1)
+}
+
+function openFile (idx) {
+    const el = fileInputs.value[idx]
+    el && el.click()
+}
+
+function onFileChange (idx, e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const it = menuItems.value[idx]
+    if (!it) return
+    if (it.previewUrl) URL.revokeObjectURL(it.previewUrl)
+    it.file = file
+    it.previewUrl = URL.createObjectURL(file)
+}
+
+/* ========== 검색/지도 ========== */
+function doSearch () {
     if (!ps || !keyword.value) return
     loading.value = true
     page.value = 1
@@ -330,7 +450,7 @@ function doSearch() {
     )
 }
 
-function focusResult(item, i) {
+function focusResult (item, i) {
     selectedPlace.value = item
     activeIndex.value = i
     const pos = new window.kakao.maps.LatLng(item.y, item.x)
@@ -339,7 +459,7 @@ function focusResult(item, i) {
     selectedPos.value = { lat: parseFloat(item.y), lng: parseFloat(item.x) }
 }
 
-function drawResultMarkers(list) {
+function drawResultMarkers (list) {
     clearResultMarkers()
     const bounds = new window.kakao.maps.LatLngBounds()
     list.forEach((item, i) => {
@@ -352,134 +472,21 @@ function drawResultMarkers(list) {
     if (!bounds.isEmpty()) addMap.setBounds(bounds)
 }
 
-function clearResultMarkers() {
+function clearResultMarkers () {
     markers.forEach(m => m.setMap(null))
     markers = []
 }
 
-// 페이지네이션
-function gotoPage(n) {
+function gotoPage (n) {
     if (kakaoPagination && n >= 1 && n <= kakaoPagination.last) kakaoPagination.gotoPage(n)
 }
-function prevPage() {
-    gotoPage(page.value - 1)
-}
-function nextPage() {
-    gotoPage(page.value + 1)
-}
+function prevPage () { gotoPage(page.value - 1) }
+function nextPage () { gotoPage(page.value + 1) }
 
-function save() {
-    if (!selectedPos.value) {
-        alert('지도를 클릭하거나 검색 결과를 선택해 위치를 지정해 주세요.')
-        return
-    }
-    const invalid = menuItems.value.some(m => !m.name?.trim() || (m.price ?? -1) < 0)
-    if (invalid) {
-        alert('메뉴명과 0 이상 가격을 입력해 주세요.')
-        return
-    }
-    const payload = {
-        position: selectedPos.value,
-        place: selectedPlace.value,
-        visitInfo: { ...visitInfo.value },
-        menuItems: menuItems.value.map(m => ({
-            name: m.name?.trim(),
-            price: Number(m.price ?? 0),
-            file: m.file || null,
-            recommended: !!m.recommended
-        }))
-    }
-    emit('saved', payload)
-    innerShow.value = false
-}
-
-function close() {
-    innerShow.value = false
-}
-
-function cleanup() {
-    try {
-        if (addMap && addMapClickHandler) {
-            window.kakao.maps.event.removeListener(addMap, 'click', addMapClickHandler)
-        }
-        clearResultMarkers()
-    } finally {
-        menuItems.value.forEach(m => m.previewUrl && URL.revokeObjectURL(m.previewUrl))
-        menuItems.value = []
-        fileInputs.value = []
-        visitInfo.value = { visitDate: new Date().toISOString().split('T')[0], rating: 0 }
-
-        addMap = null
-        addMarker = null
-        addMapClickHandler = null
-        results.value = []
-        selectedPlace.value = null
-        kakaoPagination = null
-        page.value = 1
-        totalPages.value = 1
-    }
-}
-
-
-const MAX_MENUS = 3
-
-const visitInfo = ref({
-    visitDate: new Date().toISOString().split('T')[0],
-    rating: 0
-})
-
-const menuItems = ref([])          // { id, name, price, file, previewUrl }
-const fileInputs = ref([])
-
-watch(innerShow, open => {
-    if (open && menuItems.value.length === 0) {
-        addMenuAfter(-1)
-    }
-})
-
-function uid() {
-    return Math.random().toString(36).slice(2, 10)
-}
-
-function addMenuAfter(index) {
-    if (menuItems.value.length >= MAX_MENUS) return
-    const newItem = {
-        id: uid(),
-        name: '',
-        price: null,
-        file: null,
-        previewUrl: '',
-        recommended: false
-    }
-    // index 뒤에 삽입 (index=-1이면 맨 앞에)
-    const pos = Math.max(-1, index) + 1
-    menuItems.value.splice(pos, 0, newItem)
-}
-
-function removeMenu(idx) {
-    const it = menuItems.value[idx]
-    if (it?.previewUrl) URL.revokeObjectURL(it.previewUrl)
-    menuItems.value.splice(idx, 1)
-    fileInputs.value.splice(idx, 1)
-}
-
-function openFile(idx) {
-    const el = fileInputs.value[idx]
-    el && el.click()
-}
-
-function onFileChange(idx, e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const it = menuItems.value[idx]
-    if (!it) return
-    if (it.previewUrl) URL.revokeObjectURL(it.previewUrl)
-    it.file = file
-    it.previewUrl = URL.createObjectURL(file)
-}
-
+/* ========== 언마운트 ========== */
 onBeforeUnmount(cleanup)
 </script>
+
 
 
 
